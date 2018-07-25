@@ -72,7 +72,7 @@ def num_to_one_hot(num, dim):
 def format_data(seqs, batch_size, num_skills):
     gap = batch_size - len(seqs)
     seqs_in = seqs + [[[0, 0]]] * gap  # pad batch data to fix size
-    seq_len = np.array(map(lambda seq: len(seq), seqs_in)) - 1
+    seq_len = np.array(list(map(lambda seq: len(seq), seqs_in))) - 1
     max_len = max(seq_len)
     x = pad_sequences(np.array([[(j[0] + num_skills * j[1]) for j in i[:-1]] for i in seqs_in]), maxlen=max_len, padding='post', value=-1)
     input_x = np.array([[num_to_one_hot(j, num_skills*2) for j in i] for i in x])

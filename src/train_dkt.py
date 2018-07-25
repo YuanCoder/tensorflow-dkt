@@ -1,8 +1,8 @@
 import argparse
 import time
 import sys
-from TensorFlowDKT import *
-from data_process import *
+from src.TensorFlowDKT import *
+from src.data_process import *
 from sklearn.metrics import roc_auc_score, precision_recall_fscore_support, accuracy_score
 
 
@@ -36,8 +36,7 @@ def run(args):
         while not train_generator.end:
             input_x, target_id, target_correctness, seqs_len, max_len = train_generator.next_batch()
             overall_loss += model.step(sess, input_x, target_id, target_correctness, seqs_len, is_train=True)
-            print "\r idx:{0}, overall_loss:{1}, time spent:{2}s".format(train_generator.pos, overall_loss,
-                                                                         time.time() - st),
+            print ("\r idx:{0}, overall_loss:{1}, time spent:{2}s".format(train_generator.pos, overall_loss, time.time() - st))
             sys.stdout.flush()
 
         # test
@@ -57,7 +56,7 @@ def run(args):
         auc_value = roc_auc_score(targets, preds)
         accuracy = accuracy_score(targets, binary_preds)
         precision, recall, f_score, _ = precision_recall_fscore_support(targets, binary_preds)
-        print "\n auc={0}, accuracy={1}, precision={2}, recall={3}".format(auc_value, accuracy, precision, recall)
+        print("\n auc={0}, accuracy={1}, precision={2}, recall={3}".format(auc_value, accuracy, precision, recall))
 
 
 if __name__ == "__main__":
