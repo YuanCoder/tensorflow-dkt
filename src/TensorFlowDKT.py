@@ -3,7 +3,6 @@ import tensorflow as tf
 
 '''
 模型构建
-
 '''
 class TensorFlowDKT(object):
     def __init__(self, config):
