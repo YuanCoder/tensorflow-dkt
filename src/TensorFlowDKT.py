@@ -27,8 +27,6 @@ class TensorFlowDKT(object):
         self.target_id = tf.placeholder(tf.int32, [batch_size, None])   #回答题目的ID
         self.target_correctness = tf.placeholder(tf.float32, [batch_size, None]) #答题对错情况
 
-
-
         # create rnn cell
         '''
         二、构建RNN层
@@ -60,7 +58,6 @@ class TensorFlowDKT(object):
         self.logits = tf.matmul(self.state_series, output_w) + output_b
         self.mat_logits = tf.reshape(self.logits, [batch_size, self.max_steps, num_skills])
         self.pred_all = tf.sigmoid(self.mat_logits)
-
 
         '''
         为了训练模型，还需要计算模型损失函数和梯度，我们结合预测和标签信息来获得损失函数

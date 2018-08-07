@@ -1,7 +1,10 @@
 import numpy as np
 import random
 
-
+'''
+读取学生做题记录文件
+@dataset_path 做题路径
+'''
 def read_file(dataset_path):
     seqs_by_student = {}
     num_skills = 0
@@ -16,11 +19,11 @@ def read_file(dataset_path):
 
 def split_dataset(seqs_by_student, sample_rate=0.2, random_seed=1):
     sorted_keys = sorted(seqs_by_student.keys())
-    random.seed(random_seed)
+    random.seed(random_seed) #random.seed(0)作用：使得随机数据可预测，即只要seed的值一样，后续生成的随机数都一样。
   #  test_keys = random.sample(sorted_keys, int(len(sorted_keys) * sample_rate))
-    test_keys = set(random.sample(sorted_keys, int(len(sorted_keys) * sample_rate)))
-    test_seqs = [seqs_by_student[k] for k in seqs_by_student if k in test_keys]
-    train_seqs = [seqs_by_student[k] for k in seqs_by_student if k not in test_keys]
+    test_keys = set(random.sample(sorted_keys, int(len(sorted_keys) * sample_rate))) #从指定序列中随机获取指定长度的片断
+    test_seqs = [seqs_by_student[k] for k in seqs_by_student if k in test_keys] # 随机学号对应的题目
+    train_seqs = [seqs_by_student[k] for k in seqs_by_student if k not in test_keys] # 不在随机抽取学号对应的题目
     return train_seqs, test_seqs
 
 
