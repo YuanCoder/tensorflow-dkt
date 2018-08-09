@@ -24,12 +24,12 @@ def run(args):
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    lr = 0.4
-    lr_decay = 0.92
+    lr = 0.4 #学习率
+    lr_decay = 0.92 #学习率衰减
     # run epoch
     for epoch in range(10):
         # train
-        model.assign_lr(sess, lr * lr_decay ** epoch)
+        model.assign_lr(sess, lr * lr_decay ** epoch) #assign_lr 方法来设置学习率
         overall_loss = 0
         train_generator.shuffle()
         st = time.time()
@@ -53,9 +53,9 @@ def run(args):
         preds = np.concatenate(preds)
         binary_preds = np.concatenate(binary_preds)
         targets = np.concatenate(targets)
-        auc_value = roc_auc_score(targets, preds)
-        accuracy = accuracy_score(targets, binary_preds)
-        precision, recall, f_score, _ = precision_recall_fscore_support(targets, binary_preds)
+        auc_value = roc_auc_score(targets, preds) #直接根据真实值（必须是二值）、预测值（可以是0/1,也可以是proba值）计算出auc值，中间过程的roc计算省略。
+        accuracy = accuracy_score(targets, binary_preds) #分类准确率分数是指所有分类正确的百分比。分类准确率这一衡量分类器的标准比较容易理解，但是它不能告诉你响应值的潜在分布，并且它也不能告诉你分类器犯错的类型。
+        precision, recall, f_score, _ = precision_recall_fscore_support(targets, binary_preds) #计算精确度、召回率、f、支持率
         print("\n auc={0}, accuracy={1}, precision={2}, recall={3}".format(auc_value, accuracy, precision, recall))
 
 

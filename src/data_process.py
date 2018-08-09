@@ -26,15 +26,15 @@ def split_dataset(seqs_by_student, sample_rate=0.2, random_seed=1):
     train_seqs = [seqs_by_student[k] for k in seqs_by_student if k not in test_keys] # 不在随机抽取学号对应的题目
     return train_seqs, test_seqs
 
-
+#填充队列
 def pad_sequences(sequences, maxlen=None, dtype='int32', padding='pre', truncating='pre', value=0.):
     lengths = [len(s) for s in sequences]
     nb_samples = len(sequences)
     if maxlen is None:
         maxlen = np.max(lengths)
 
-    # take the sample shape from the first non empty sequence
-    # checking for consistency in the main loop below.
+    # take the sample shape from the first non empty sequence 从第一个非空序列中取样
+    # checking for consistency in the main loop below.  检查下面主循环的一致性
     sample_shape = tuple()
     for s in sequences:
         if len(s) > 0:
@@ -65,24 +65,25 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', padding='pre', truncati
             raise ValueError('Padding type "%s" not understood' % padding)
     return x
 
-
+# 转换成one-hot
 def num_to_one_hot(num, dim):
     base = np.zeros(dim)
     if num >= 0:
         base[num] += 1
     return base
 
-
+#格式化数据
 def format_data(seqs, batch_size, num_skills):
     gap = batch_size - len(seqs)
     seqs_in = seqs + [[[0, 0]]] * gap  # pad batch data to fix size
     seq_len = np.array(list(map(lambda seq: len(seq), seqs_in))) - 1
-    max_len = max(seq_len)
+    max_len = max(seq_len) #最大问题长度
     x = pad_sequences(np.array([[(j[0] + num_skills * j[1]) for j in i[:-1]] for i in seqs_in]), maxlen=max_len, padding='post', value=-1)
     input_x = np.array([[num_to_one_hot(j, num_skills*2) for j in i] for i in x])
-    target_id = pad_sequences(np.array([[j[0] for j in i[1:]] for i in seqs_in]), maxlen=max_len, padding='post', value=0)
+    target_id = pad_sequences( np.array([[j[0] for j in i[1:]] for i in seqs_in]), maxlen=max_len, padding='post', value=0 )
     target_correctness = pad_sequences(np.array([[j[1] for j in i[1:]] for i in seqs_in]), maxlen=max_len, padding='post', value=0)
     return input_x, target_id, target_correctness, seq_len, max_len
+          #输入矩阵，问题矩阵，   答案矩阵，           队列长度，最大长度
 
 
 class DataGenerator(object):
@@ -107,6 +108,7 @@ class DataGenerator(object):
         input_x, target_id, target_correctness, seqs_len, max_len = format_data(batch_seqs, batch_size, self.num_skills)
         return input_x, target_id, target_correctness, seqs_len, max_len
 
+    #随机序列
     def shuffle(self):
         self.pos = 0
         self.end = False
