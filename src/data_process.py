@@ -17,11 +17,11 @@ def read_file(dataset_path):
     return seqs_by_student, num_skills + 1
 
 
-def split_dataset(seqs_by_student, sample_rate=0.2, random_seed=1):
+def split_dataset(seqs_by_student, sample_rate=0.5, random_seed=1):
     sorted_keys = sorted(seqs_by_student.keys())
     random.seed(random_seed) #random.seed(0)作用：使得随机数据可预测，即只要seed的值一样，后续生成的随机数都一样。
   #  test_keys = random.sample(sorted_keys, int(len(sorted_keys) * sample_rate))
-    test_keys = set(random.sample(sorted_keys, int(len(sorted_keys) * sample_rate))) #从指定序列中随机获取指定长度的片断
+    test_keys = set(random.sample(sorted_keys, int(len(sorted_keys) * sample_rate))) #从指定序列中随机获取指定长度的片断    sample_rate 抽样率
     test_seqs = [seqs_by_student[k] for k in seqs_by_student if k in test_keys] # 随机学号对应的题目
     train_seqs = [seqs_by_student[k] for k in seqs_by_student if k not in test_keys] # 不在随机抽取学号对应的题目
     return train_seqs, test_seqs
@@ -52,7 +52,7 @@ def pad_sequences(sequences, maxlen=None, dtype='int32', padding='pre', truncati
         else:
             raise ValueError('Truncating type "%s" not understood' % truncating)
 
-        # check `trunc` has expected shape
+        # check `trunc` has expected shape 检查`trunc`有预期的形状
         trunc = np.asarray(trunc, dtype=dtype)
         if trunc.shape[1:] != sample_shape:
             raise ValueError('Shape of sample %s of sequence at position %s is different from expected shape %s' %
@@ -78,12 +78,12 @@ def format_data(seqs, batch_size, num_skills):
     seqs_in = seqs + [[[0, 0]]] * gap  # pad batch data to fix size
     seq_len = np.array(list(map(lambda seq: len(seq), seqs_in))) - 1
     max_len = max(seq_len) #最大问题长度
-    x = pad_sequences(np.array([[(j[0] + num_skills * j[1]) for j in i[:-1]] for i in seqs_in]), maxlen=max_len, padding='post', value=-1)
-    input_x = np.array([[num_to_one_hot(j, num_skills*2) for j in i] for i in x])
-    target_id = pad_sequences( np.array([[j[0] for j in i[1:]] for i in seqs_in]), maxlen=max_len, padding='post', value=0 )
+    x = pad_sequences(np.array([[(j[0] + num_skills * j[1]) for j in i[:-1]] for i in seqs_in]), maxlen=max_len, padding='post', value=-1) # 长度达不到 maxlen的列表用-1来填充
+    input_x = np.array([[num_to_one_hot(j, num_skills*2) for j in i] for i in x]) # 题目One-Hot码
+    target_id = pad_sequences( np.array([[j[0] for j in i[1:]] for i in seqs_in]), maxlen=max_len, padding='post', value=0 ) # 长度达不到 maxlen的列表用-1来填充
     target_correctness = pad_sequences(np.array([[j[1] for j in i[1:]] for i in seqs_in]), maxlen=max_len, padding='post', value=0)
     return input_x, target_id, target_correctness, seq_len, max_len
-          #输入矩阵，问题矩阵，   答案矩阵，           队列长度，最大长度
+    #输入题目One-Hot向量矩阵，问题矩阵，   答案矩阵，    队列长度，最大长度
 
 
 class DataGenerator(object):
@@ -113,7 +113,7 @@ class DataGenerator(object):
         self.pos = 0
         self.end = False
         np.random.shuffle(self.seqs)
-
+    #重置
     def reset(self):
         self.pos = 0
         self.end = False

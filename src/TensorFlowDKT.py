@@ -55,9 +55,9 @@ class TensorFlowDKT(object):
         output_w = tf.get_variable("W", [hidden_neurons[-1], num_skills])
         output_b = tf.get_variable("b", [num_skills])
         self.state_series = tf.reshape(state_series, [batch_size * self.max_steps, hidden_neurons[-1]])
-        self.logits = tf.matmul(self.state_series, output_w) + output_b
+        self.logits = tf.matmul(self.state_series, output_w) + output_b  # 方程
         self.mat_logits = tf.reshape(self.logits, [batch_size, self.max_steps, num_skills])
-        self.pred_all = tf.sigmoid(self.mat_logits)
+        self.pred_all = tf.sigmoid(self.mat_logits) # 分类预测
 
         '''
         为了训练模型，还需要计算模型损失函数和梯度，我们结合预测和标签信息来获得损失函数
